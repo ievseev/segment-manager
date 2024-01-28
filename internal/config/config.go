@@ -1,13 +1,21 @@
 package config
 
-import "github.com/ilyakaznacheev/cleanenv"
+import (
+	"github.com/ilyakaznacheev/cleanenv"
+	"log"
+)
 
 type Config struct {
-	ServiceURL  string `env:"SERVICE_URL"`
-	ServicePort string `env:"SERVICE_PORT"`
+	//ServicePath string `env:"SERVICE_PATH"`
+	StoragePath string `env:"STORAGE_PATH"`
 }
 
-// ReadConfig функция для чтения конфигурации из файла и переменных окружения
-func ReadConfig(cfg *Config, path string) error {
-	return cleanenv.ReadConfig(path, cfg)
+// MustLoad функция для чтения конфигурации из файла и переменных окружения
+func MustLoad(path string) *Config {
+	cfg := &Config{}
+	if err := cleanenv.ReadConfig(path, cfg); err != nil {
+		log.Fatalf("Read config error: %v", err)
+	}
+
+	return cfg
 }
