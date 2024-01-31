@@ -6,15 +6,8 @@ import (
 	"os"
 	"segment-manager/internal/config"
 	"segment-manager/internal/storage/postgres"
+	"segment-manager/internal/store"
 )
-
-//func CreateSegmentHandler(resp http.ResponseWriter, req *http.Request) {
-//
-//}
-//
-//func GetSegmentHandler(resp http.ResponseWriter, req *http.Request) {
-//
-//}
 
 func main() {
 	//TODO: init config - cleanenv
@@ -30,6 +23,12 @@ func main() {
 	if err != nil {
 		log.Error("Failed to init storage") // TODO сделать ошибку детальнее
 		os.Exit(1)                          // идти дальше смысла нет, выходим
+	}
+
+	segmentDB := store.New(storage)
+	err = segmentDB.SaveSegment("segment")
+	if err != nil {
+		return
 	}
 
 	fmt.Println(storage)

@@ -8,6 +8,7 @@ type segmentCreateRepo interface {
 
 type Service struct {
 	// TODO создание сегмента в БД
+	
 }
 
 func New() *Service {

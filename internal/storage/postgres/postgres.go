@@ -20,7 +20,11 @@ func New(storagePath string) (*Storage, error) {
 		return nil, fmt.Errorf("DB connection error while %s: %v", op, err)
 	}
 
-	//err = db.Ping()
-
 	return &Storage{db: db}, nil
+}
+
+// TODO Сlose() и другие ребята?
+
+func (s *Storage) Exec(query string, args ...interface{}) (sql.Result, error) {
+	return s.db.Exec(query, args...)
 }
