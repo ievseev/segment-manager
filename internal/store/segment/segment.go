@@ -1,6 +1,7 @@
-package store
+package segment
 
 import (
+	"context"
 	"fmt"
 	"segment-manager/internal/storage/postgres"
 )
@@ -14,7 +15,7 @@ func New(db *postgres.Storage) *PG {
 }
 
 // TODO прокинуть контекст ?
-func (p *PG) SaveSegment(segmentName string) error {
+func (p *PG) SaveSegment(ctx context.Context, segmentName string) error {
 	query := fmt.Sprintf("INSERT INTO segments (name) VALUES (%s)", "$1")
 
 	_, err := p.db.Exec(query, segmentName)

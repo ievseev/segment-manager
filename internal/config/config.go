@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	//ServicePath string `env:"SERVICE_PATH"`
+	ServicePath string `env:"SERVICE_PATH"`
 	StoragePath string `env:"STORAGE_PATH"`
 }
 

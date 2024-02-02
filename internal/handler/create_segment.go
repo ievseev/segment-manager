@@ -1,23 +1,46 @@
 package handler
 
-import "context"
+import (
+	"context"
+	"github.com/go-chi/render"
+	"github.com/go-playground/validator/v10"
+	"log/slog"
+	"net/http"
+)
 
-type segmentCreateService interface {
-	Create(ctx context.Context, name string) (int64, error) // используем контекст, в ответе обязательно предусматриваем ошибку
+type SegmentService interface {
+	CreateSegment(ctx context.Context, name string) error
 }
 
-type SegmentCreateHandler struct {
-	segmentCreateService segmentCreateService
-}
+func New(log *slog.Logger, segmentSaver SegmentService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.Background()
 
-func New(segmentCreateService segmentCreateService) *SegmentCreateHandler {
-	return &SegmentCreateHandler{segmentCreateService: segmentCreateService}
-}
+		var req Request
 
-// в хэндлер должен прилететь контекст, и далее по вызовам он будет продолжать передаваться
-func (s *SegmentCreateHandler) Handle(ctx context.Context, request string, response int64) error {
-	// валидация параметра ???
-	//segmentID := s.segmentCreateService.Create(ctx, request)
+		// TODO добавить вариативную обработку ошибок
+		err := render.DecodeJSON(r.Body, &req)
+		if err != nil {
+			log.Error("Failed to decode req")
 
-	return nil
+			render.JSON(w, r, Error())
+		}
+
+		if err := validator.New().Struct(req); err != nil {
+			log.Error("Request validation error")
+
+			render.JSON(w, r, Error())
+		}
+
+		err = segmentSaver.CreateSegment(ctx, req.SegmentName)
+		if err != nil {
+			log.Error("Failed to create segment")
+
+			render.JSON(w, r, Error())
+		}
+
+		render.JSON(w, r, OK())
+
+		return
+	}
 }

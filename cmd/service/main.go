@@ -1,12 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
+	"net/http"
 	"os"
 	"segment-manager/internal/config"
+	segHandler "segment-manager/internal/handler"
+	segService "segment-manager/internal/service/segment"
 	"segment-manager/internal/storage/postgres"
-	"segment-manager/internal/store"
+	"segment-manager/internal/store/segment"
 )
 
 func main() {
@@ -25,15 +29,30 @@ func main() {
 		os.Exit(1)                          // идти дальше смысла нет, выходим
 	}
 
-	segmentDB := store.New(storage)
-	err = segmentDB.SaveSegment("segment")
-	if err != nil {
-		return
+	//TODO: init router - chi (совместим с net/http)
+	segmentDB := segment.New(storage)
+	segmentService := segService.New(segmentDB)
+
+	router := chi.NewRouter()
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
+
+	router.Post("/api/createSegment", segHandler.New(log, segmentService))
+
+	log.Info("server starting")
+
+	srv := &http.Server{
+		Addr:    cfg.ServicePath,
+		Handler: router,
+		//ReadTimeout:       0,
+		//WriteTimeout:      0,
+		//IdleTimeout:       0,
 	}
 
-	fmt.Println(storage)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to start server")
+	}
 
-	//TODO: init router - chi (совместим с net/http)
-
-	//TODO: run server
+	log.Error("server stopped")
 }

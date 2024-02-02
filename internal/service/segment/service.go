@@ -1,20 +1,27 @@
 package segment
 
-import "context"
+import (
+	"context"
+	"segment-manager/internal/store/segment"
+)
 
 type segmentCreateRepo interface {
-	Create(name string) error
+	SaveSegment(ctx context.Context, segmentName string) error
 }
 
 type Service struct {
-	// TODO создание сегмента в БД
-	
+	segmentRepo *segment.PG
 }
 
-func New() *Service {
-	return &Service{}
+func New(segmentRepo *segment.PG) *Service {
+	return &Service{segmentRepo: segmentRepo}
 }
 
-func (s *Service) CreateSegment(ctx context.Context, name string) (int64, error) {
-	return 1, nil
+func (s *Service) CreateSegment(ctx context.Context, name string) error {
+	err := s.segmentRepo.SaveSegment(ctx, name)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
