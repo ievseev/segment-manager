@@ -1,4 +1,4 @@
-package handler
+package api_create_segment
 
 import (
 	"context"
@@ -12,7 +12,7 @@ type SegmentService interface {
 	CreateSegment(ctx context.Context, name string) error
 }
 
-func New(log *slog.Logger, segmentSaver SegmentService) http.HandlerFunc {
+func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.Background()
 
@@ -32,7 +32,7 @@ func New(log *slog.Logger, segmentSaver SegmentService) http.HandlerFunc {
 			render.JSON(w, r, Error())
 		}
 
-		err = segmentSaver.CreateSegment(ctx, req.SegmentName)
+		err = segmentService.CreateSegment(ctx, req.SegmentName)
 		if err != nil {
 			log.Error("Failed to create segment")
 
