@@ -9,7 +9,7 @@ import (
 )
 
 type SegmentService interface {
-	CreateSegment(ctx context.Context, name string) error
+	CreateSegment(ctx context.Context, slug string) error
 }
 
 func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
@@ -32,7 +32,7 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 			render.JSON(w, r, Error())
 		}
 
-		err = segmentService.CreateSegment(ctx, req.SegmentName)
+		err = segmentService.CreateSegment(ctx, req.Slug)
 		if err != nil {
 			log.Error("Failed to create segment")
 

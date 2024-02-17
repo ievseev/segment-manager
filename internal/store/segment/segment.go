@@ -16,7 +16,7 @@ func New(db *postgres.Storage) *PG {
 
 // TODO прокинуть контекст ?
 func (p *PG) SaveSegment(ctx context.Context, segmentName string) error {
-	query := fmt.Sprintf("INSERT INTO segments (name) VALUES (%s)", "$1")
+	query := fmt.Sprintf("INSERT INTO segments (slug) VALUES (%s)", "$1")
 
 	_, err := p.db.Exec(query, segmentName)
 	if err != nil {
@@ -28,7 +28,7 @@ func (p *PG) SaveSegment(ctx context.Context, segmentName string) error {
 
 // TODO прокинуть контекст ?
 func (p *PG) DeleteSegment(ctx context.Context, segmentName string) error {
-	query := fmt.Sprintf("DELETE FROM segments WHERE (name)=(%s)", "$1")
+	query := fmt.Sprintf("DELETE FROM segments WHERE (slug)=(%s)", "$1")
 
 	_, err := p.db.Exec(query, segmentName)
 	if err != nil {

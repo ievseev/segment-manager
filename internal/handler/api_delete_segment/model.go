@@ -1,7 +1,7 @@
 package api_delete_segment
 
 type Request struct {
-	SegmentName string `json:"segment_name" validate:"required"`
+	Slug string `json:"slug" validate:"required"`
 }
 
 type Response struct {

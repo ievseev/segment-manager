@@ -16,7 +16,7 @@ import (
 
 func main() {
 	//TODO: init config - cleanenv
-	cfg := config.MustLoad("config/.env")
+	cfg := config.MustLoad(".env")
 
 	//TODO: init logger - slog
 	log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{

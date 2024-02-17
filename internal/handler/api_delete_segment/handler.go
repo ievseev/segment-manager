@@ -9,7 +9,7 @@ import (
 )
 
 type SegmentService interface {
-	DeleteSegment(ctx context.Context, name string) error
+	DeleteSegment(ctx context.Context, slug string) error
 }
 
 func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
@@ -32,7 +32,7 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 			render.JSON(w, r, Error())
 		}
 
-		err = segmentService.DeleteSegment(ctx, req.SegmentName)
+		err = segmentService.DeleteSegment(ctx, req.Slug)
 		if err != nil {
 			log.Error("Failed to delete segment")
 
