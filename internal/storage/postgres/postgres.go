@@ -17,7 +17,12 @@ func New(storagePath string) (*Storage, error) {
 	// TODO: Прикрутить SSL
 	db, err := sql.Open("postgres", storagePath+"?sslmode=disable")
 	if err != nil {
-		return nil, fmt.Errorf("DB connection error while %s: %v", op, err)
+		return nil, fmt.Errorf("DB open error while %s operation: %v", op, err)
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("DB ping error while %s operation: %v", op, err)
 	}
 
 	return &Storage{db: db}, nil

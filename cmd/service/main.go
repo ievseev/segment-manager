@@ -26,8 +26,8 @@ func main() {
 	//TODO: init storage - postgres
 	storage, err := postgres.New(cfg.StoragePath)
 	if err != nil {
-		log.Error("Failed to init storage") // TODO сделать ошибку детальнее
-		os.Exit(1)                          // идти дальше смысла нет, выходим
+		log.Error("Failed to init storage:", err)
+		os.Exit(1) // идти дальше смысла нет, выходим
 	}
 
 	//TODO: init router - chi (совместим с net/http)
