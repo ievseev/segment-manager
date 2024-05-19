@@ -15,7 +15,7 @@ func New(storagePath string) (*Storage, error) {
 	const op = "storage.postgres.New"
 
 	// TODO: Прикрутить SSL
-	db, err := sql.Open("postgres", storagePath+"?sslmode=disable")
+	db, err := sql.Open("postgres", storagePath)
 	if err != nil {
 		return nil, fmt.Errorf("DB open error while %s operation: %v", op, err)
 	}
