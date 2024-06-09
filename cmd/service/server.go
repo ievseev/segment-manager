@@ -23,7 +23,7 @@ type Server struct {
 
 func NewServer(cfg *config.Config, log *slog.Logger) (*Server, error) {
 	// init storage - postgres
-	storage, err := postgres.New(cfg.StoragePath)
+	storage, err := postgres.New(cfg)
 	if err != nil {
 		return nil, err
 	}

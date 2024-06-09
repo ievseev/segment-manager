@@ -8,10 +8,10 @@ import (
 	"segment-manager/internal/config"
 )
 
-func Run(cnf *config.Config) error {
+func Run(cfg *config.Config) error {
 	m, err := migrate.New(
-		cnf.MigrationsPath,
-		cnf.StoragePath,
+		cfg.MigrationsPath,
+		cfg.StoragePath,
 	)
 	if err != nil {
 		return err
