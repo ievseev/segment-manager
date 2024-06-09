@@ -1,10 +1,11 @@
 package main
 
 import (
-	"errors"
 	"log/slog"
 	"net/http"
 	"os"
+
+	"segment-manager/db/migrations"
 	"segment-manager/internal/config"
 	"segment-manager/internal/handler/api_create_segment"
 	"segment-manager/internal/handler/api_delete_segment"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
@@ -36,19 +36,11 @@ func main() {
 	}
 
 	// apply migrations
-	m, err := migrate.New(
-		"file://db/migrations",
-		cfg.StoragePath,
-	)
+	err = migrations.Run(cfg.MigrationsPath, cfg.StoragePath)
 	if err != nil {
-		log.Error("Failed to create migrate instance: %v", err)
+		log.Error("Failed to run migrations:", err)
+		os.Exit(1)
 	}
-
-	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		log.Error("Failed to run migrations: %v", err)
-	}
-
-	log.Info("Migrations applied successfully!")
 
 	//TODO: init router - chi (совместим с net/http)
 	segmentDB := segment.New(storage)

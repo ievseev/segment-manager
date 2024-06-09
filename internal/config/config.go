@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	ServicePath string `env:"SERVICE_PATH"`
-	StoragePath string `env:"STORAGE_PATH"`
+	ServicePath    string `env:"SERVICE_PATH"`
+	StoragePath    string `env:"STORAGE_PATH"`
+	MigrationsPath string `env:"MIGRATIONS_PATH"`
 }
 
 // MustLoad функция для чтения конфигурации из файла и переменных окружения
