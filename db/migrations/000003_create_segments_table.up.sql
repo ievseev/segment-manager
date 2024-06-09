@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS segments;
-
 CREATE TABLE segments
 (
     id   SERIAL PRIMARY KEY,
