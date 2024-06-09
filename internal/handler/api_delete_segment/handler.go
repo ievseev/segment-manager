@@ -2,10 +2,11 @@ package api_delete_segment
 
 import (
 	"context"
-	"github.com/go-chi/render"
-	"github.com/go-playground/validator/v10"
 	"log/slog"
 	"net/http"
+
+	"github.com/go-chi/render"
+	"github.com/go-playground/validator/v10"
 )
 
 type SegmentService interface {
