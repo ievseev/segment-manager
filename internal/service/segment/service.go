@@ -5,8 +5,8 @@ import (
 )
 
 type segmentRepo interface {
-	SaveSegment(ctx context.Context, segmentName string) error
-	DeleteSegment(ctx context.Context, segmentName string) error
+	Save(ctx context.Context, segmentName string) error
+	Delete(ctx context.Context, segmentName string) error
 }
 
 type Service struct {
@@ -18,7 +18,7 @@ func New(segmentRepo segmentRepo) *Service {
 }
 
 func (s *Service) CreateSegment(ctx context.Context, name string) error {
-	err := s.segmentRepo.SaveSegment(ctx, name)
+	err := s.segmentRepo.Save(ctx, name)
 	if err != nil {
 		return err
 	}
@@ -26,8 +26,8 @@ func (s *Service) CreateSegment(ctx context.Context, name string) error {
 	return nil
 }
 
-func (s *Service) DeleteSegment(ctx context.Context, name string) error {
-	err := s.segmentRepo.DeleteSegment(ctx, name)
+func (s *Service) Delete(ctx context.Context, name string) error {
+	err := s.segmentRepo.Delete(ctx, name)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -32,6 +33,6 @@ func New(cfg *config.Config) (*Storage, error) {
 
 // TODO Сlose() и другие ребята?
 
-func (s *Storage) Exec(query string, args ...interface{}) (sql.Result, error) {
-	return s.db.Exec(query, args...)
+func (s *Storage) ExecContext(ctx context.Context, query string, args ...interface{}) (interface{}, error) {
+	return s.db.ExecContext(ctx, query, args...)
 }
