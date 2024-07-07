@@ -23,12 +23,16 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 			log.Error("Failed to decode req")
 
 			render.JSON(w, r, Error())
+
+			return
 		}
 
 		if err := validator.New().Struct(req); err != nil {
 			log.Error("Request validation error")
 
 			render.JSON(w, r, Error())
+
+			return
 		}
 
 		err = segmentService.CreateSegment(r.Context(), req.Slug)
@@ -36,6 +40,8 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 			log.Error("Failed to create segment")
 
 			render.JSON(w, r, Error())
+
+			return
 		}
 
 		render.JSON(w, r, OK())
