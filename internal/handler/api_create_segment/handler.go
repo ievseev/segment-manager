@@ -2,6 +2,7 @@ package api_create_segment
 
 import (
 	"context"
+	"encoding/json"
 	"log/slog"
 	"net/http"
 
@@ -17,20 +18,19 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req Request
 
-		// TODO добавить вариативную обработку ошибок
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			log.Error("Failed to decode req")
-
-			render.JSON(w, r, Error())
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(Error())
 
 			return
 		}
 
 		if err := validator.New().Struct(req); err != nil {
 			log.Error("Request validation error")
-
-			render.JSON(w, r, Error())
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(Error())
 
 			return
 		}
@@ -38,8 +38,8 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 		err = segmentService.CreateSegment(r.Context(), req.Slug)
 		if err != nil {
 			log.Error("Failed to create segment")
-
-			render.JSON(w, r, Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(Error())
 
 			return
 		}

@@ -2,7 +2,6 @@ package segment
 
 import (
 	"context"
-	"fmt"
 )
 
 type Executer interface {
@@ -19,11 +18,13 @@ func New(executer Executer) *Segment {
 	}
 }
 
-// TODO прокинуть контекст ?
 func (s *Segment) Save(ctx context.Context, segmentName string) error {
-	query := fmt.Sprintf("INSERT INTO segments (slug) VALUES (%s)", "$1")
+	query, args, err := buildInsertQuery(segmentName)
+	if err != nil {
+		return err
+	}
 
-	_, err := s.executer.ExecContext(ctx, query, segmentName)
+	_, err = s.executer.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -31,11 +32,13 @@ func (s *Segment) Save(ctx context.Context, segmentName string) error {
 	return nil
 }
 
-// TODO прокинуть контекст ?
 func (s *Segment) Delete(ctx context.Context, segmentName string) error {
-	query := fmt.Sprintf("DELETE FROM segments WHERE (slug)=(%s)", "$1")
+	query, args, err := buildDeleteQuery(segmentName)
+	if err != nil {
+		return err
+	}
 
-	_, err := s.executer.ExecContext(ctx, query, segmentName)
+	_, err = s.executer.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}

@@ -17,20 +17,17 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req Request
 
-		// TODO добавить вариативную обработку ошибок
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			log.Error("Failed to decode req")
-
-			render.JSON(w, r, Error())
+			http.Error(w, "Failed to decode req", http.StatusBadRequest)
 
 			return
 		}
 
 		if err := validator.New().Struct(req); err != nil {
 			log.Error("Request validation error")
-
-			render.JSON(w, r, Error())
+			http.Error(w, "Request validation error", http.StatusBadRequest)
 
 			return
 		}
@@ -38,8 +35,7 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 		err = segmentService.Delete(r.Context(), req.Slug)
 		if err != nil {
 			log.Error("Failed to delete segment")
-
-			render.JSON(w, r, Error())
+			http.Error(w, "Failed to delete segment", http.StatusInternalServerError)
 
 			return
 		}
