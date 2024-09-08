@@ -5,7 +5,7 @@ import (
 )
 
 type segmentRepo interface {
-	Save(ctx context.Context, segmentName string) error
+	Save(ctx context.Context, segmentName string) (int64, error)
 	Delete(ctx context.Context, segmentName string) error
 }
 
@@ -17,13 +17,15 @@ func New(segmentRepo segmentRepo) *Service {
 	return &Service{segmentRepo: segmentRepo}
 }
 
-func (s *Service) CreateSegment(ctx context.Context, name string) error {
-	err := s.segmentRepo.Save(ctx, name)
+func (s *Service) CreateSegment(ctx context.Context, name string) (int64, error) {
+	var segmentID int64
+
+	segmentID, err := s.segmentRepo.Save(ctx, name)
 	if err != nil {
-		return err
+		return segmentID, err
 	}
 
-	return nil
+	return segmentID, nil
 }
 
 func (s *Service) Delete(ctx context.Context, name string) error {

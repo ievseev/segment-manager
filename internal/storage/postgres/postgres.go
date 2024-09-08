@@ -33,6 +33,10 @@ func New(cfg *config.Config) (*Storage, error) {
 
 // TODO Сlose() и другие ребята?
 
-func (s *Storage) ExecContext(ctx context.Context, query string, args ...interface{}) (interface{}, error) {
+func (s *Storage) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
 	return s.db.ExecContext(ctx, query, args...)
+}
+
+func (s *Storage) QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row {
+	return s.db.QueryRowContext(ctx, query, args...)
 }

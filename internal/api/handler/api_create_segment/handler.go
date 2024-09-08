@@ -1,4 +1,4 @@
-package api_delete_segment
+package api_create_segment
 
 import (
 	"context"
@@ -7,10 +7,12 @@ import (
 
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
+
+	"segment-manager/internal/api/model"
 )
 
 type SegmentService interface {
-	Delete(ctx context.Context, slug string) error
+	CreateSegment(ctx context.Context, slug string) (int64, error)
 }
 
 func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
@@ -20,27 +22,29 @@ func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			log.Error("Failed to decode req")
-			http.Error(w, "Failed to decode req", http.StatusBadRequest)
+			model.SendErrorResponse(w, http.StatusBadRequest, "Failed to decode req")
 
 			return
 		}
 
 		if err := validator.New().Struct(req); err != nil {
 			log.Error("Request validation error")
-			http.Error(w, "Request validation error", http.StatusBadRequest)
+			model.SendErrorResponse(w, http.StatusBadRequest, "Request validation error")
 
 			return
 		}
 
-		err = segmentService.Delete(r.Context(), req.Slug)
+		segmentID, err := segmentService.CreateSegment(r.Context(), req.Slug)
 		if err != nil {
-			log.Error("Failed to delete segment")
-			http.Error(w, "Failed to delete segment", http.StatusInternalServerError)
+			log.Error("Failed to create segment")
+			model.SendErrorResponse(w, http.StatusInternalServerError, "Failed to create segment")
 
 			return
 		}
 
-		render.JSON(w, r, OK())
+		render.JSON(w, r, Response{
+			SegmentID: segmentID,
+		})
 
 		return
 	}

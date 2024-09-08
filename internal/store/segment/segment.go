@@ -2,10 +2,12 @@ package segment
 
 import (
 	"context"
+	"database/sql"
 )
 
 type Executer interface {
-	ExecContext(ctx context.Context, query string, args ...interface{}) (interface{}, error)
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
+	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 }
 
 type Segment struct {
@@ -18,18 +20,20 @@ func New(executer Executer) *Segment {
 	}
 }
 
-func (s *Segment) Save(ctx context.Context, segmentName string) error {
+func (s *Segment) Save(ctx context.Context, segmentName string) (int64, error) {
+	var segmentID int64
+
 	query, args, err := buildInsertQuery(segmentName)
 	if err != nil {
-		return err
+		return segmentID, err
 	}
 
-	_, err = s.executer.ExecContext(ctx, query, args...)
+	err = s.executer.QueryRowContext(ctx, query, args...).Scan(&segmentID)
 	if err != nil {
-		return err
+		return segmentID, err
 	}
 
-	return nil
+	return segmentID, nil
 }
 
 func (s *Segment) Delete(ctx context.Context, segmentName string) error {

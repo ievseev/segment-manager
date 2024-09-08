@@ -4,9 +4,9 @@ import (
 	"log/slog"
 	"net/http"
 
+	"segment-manager/internal/api/handler/api_create_segment"
+	"segment-manager/internal/api/handler/api_delete_segment"
 	"segment-manager/internal/config"
-	"segment-manager/internal/handler/api_create_segment"
-	"segment-manager/internal/handler/api_delete_segment"
 	segService "segment-manager/internal/service/segment"
 	"segment-manager/internal/storage/postgres"
 	"segment-manager/internal/store/segment"
