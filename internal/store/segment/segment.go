@@ -11,12 +11,12 @@ type Executer interface {
 }
 
 type Segment struct {
-	executer Executer
+	Executer Executer
 }
 
 func New(executer Executer) *Segment {
 	return &Segment{
-		executer: executer,
+		Executer: executer,
 	}
 }
 
@@ -28,7 +28,7 @@ func (s *Segment) Save(ctx context.Context, segmentName string) (int64, error) {
 		return segmentID, err
 	}
 
-	err = s.executer.QueryRowContext(ctx, query, args...).Scan(&segmentID)
+	err = s.Executer.QueryRowContext(ctx, query, args...).Scan(&segmentID)
 	if err != nil {
 		return segmentID, err
 	}
@@ -42,7 +42,7 @@ func (s *Segment) Delete(ctx context.Context, segmentName string) error {
 		return err
 	}
 
-	_, err = s.executer.ExecContext(ctx, query, args...)
+	_, err = s.Executer.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
