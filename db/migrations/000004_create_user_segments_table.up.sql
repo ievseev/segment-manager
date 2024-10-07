@@ -1,6 +1,8 @@
 CREATE TABLE users_segments
 (
-    id         SERIAL PRIMARY KEY,
-    user_id    BIGINT NOT NULL,
-    segment_id BIGINT NOT NULL
+    user_id     BIGINT NOT NULL,
+    segment_ids BIGINT[] NOT NULL,
+    PRIMARY KEY (user_id, segment_ids),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (segment_ids) REFERENCES segments(id)
 )
