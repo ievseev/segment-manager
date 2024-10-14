@@ -25,7 +25,7 @@ type testSuite struct {
 
 func (s *testSuite) TestSaveAndDeleteSegment() {
 	store := New(s.db)
-	//defer s.truncate()
+	defer s.tearDown()
 
 	ctx := context.Background()
 	firstSegment, err := store.Create(ctx, "test_name")
@@ -37,7 +37,7 @@ func (s *testSuite) TestSaveAndDeleteSegment() {
 
 }
 
-func TestStore_Flow(t *testing.T) {
+func TestSegmentSuite(t *testing.T) {
 	ts := testSuite{}
 
 	cfg := config.MustLoad("../../../.test.env")
@@ -49,6 +49,10 @@ func TestStore_Flow(t *testing.T) {
 	suite.Run(t, &ts)
 }
 
-//func (s *testSuite) truncate() {
-//
-//}
+func (s *testSuite) tearDown() {
+	ctx := context.Background()
+	_, err := s.db.ExecContext(ctx, "TRUNCATE TABLE segments RESTART IDENTITY")
+	if err != nil {
+		return
+	}
+}
