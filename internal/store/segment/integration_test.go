@@ -49,7 +49,5 @@ func TestSegmentSuite(t *testing.T) {
 func (s *testSuite) TearDownTest() {
 	ctx := context.Background()
 	_, err := s.db.ExecContext(ctx, "TRUNCATE TABLE segments RESTART IDENTITY")
-	if err != nil {
-		return
-	}
+	require.NoError(s.T(), err)
 }
