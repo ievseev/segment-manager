@@ -20,36 +20,33 @@ type testSuite struct {
 	db *postgres.Storage
 }
 
-// TODO
-// добавить очистку БД
-
 func (s *testSuite) TestSaveAndDeleteSegment() {
 	store := New(s.db)
-	defer s.tearDown()
 
 	ctx := context.Background()
 	firstSegment, err := store.Create(ctx, "test_name")
 	require.NoError(s.T(), err)
-	require.True(s.T(), firstSegment == 1)
+	require.Equal(s.T(), int64(1), firstSegment)
 
 	err = store.Delete(ctx, "test_name")
 	require.NoError(s.T(), err)
 
 }
 
-func TestSegmentSuite(t *testing.T) {
-	ts := testSuite{}
-
+func (s *testSuite) SetupSuite() {
 	cfg := config.MustLoad("../../../.test.env")
 	err := migrations.Run(cfg)
-	require.NoError(t, err)
+	require.NoError(s.T(), err)
 
-	ts.db, _ = postgres.New(cfg)
-
-	suite.Run(t, &ts)
+	s.db, err = postgres.New(cfg)
+	require.NoError(s.T(), err)
 }
 
-func (s *testSuite) tearDown() {
+func TestSegmentSuite(t *testing.T) {
+	suite.Run(t, &testSuite{})
+}
+
+func (s *testSuite) TearDownTest() {
 	ctx := context.Background()
 	_, err := s.db.ExecContext(ctx, "TRUNCATE TABLE segments RESTART IDENTITY")
 	if err != nil {
