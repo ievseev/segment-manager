@@ -20,7 +20,7 @@ func New(executer Executer) *UserSegment {
 	}
 }
 
-func (s *UserSegment) Save(ctx context.Context, userID string, segmentIDs []string) error {
+func (s *UserSegment) Create(ctx context.Context, userID string, segmentIDs []string) error {
 	query, args, err := buildUpsertQuery(userID, segmentIDs)
 	if err != nil {
 		return err

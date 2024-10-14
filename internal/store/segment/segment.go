@@ -20,7 +20,7 @@ func New(executer Executer) *Segment {
 	}
 }
 
-func (s *Segment) Save(ctx context.Context, segmentName string) (int64, error) {
+func (s *Segment) Create(ctx context.Context, segmentName string) (int64, error) {
 	var segmentID int64
 
 	query, args, err := buildInsertQuery(segmentName)

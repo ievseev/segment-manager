@@ -17,8 +17,7 @@ import (
 
 type testSuite struct {
 	suite.Suite
-	ctx context.Context
-	db  *postgres.Storage
+	db *postgres.Storage
 }
 
 // TODO
@@ -26,23 +25,20 @@ type testSuite struct {
 
 func (s *testSuite) TestSaveAndDeleteSegment() {
 	store := New(s.db)
-	defer s.truncate()
+	//defer s.truncate()
 
-	firstSegment, err := store.Save(s.ctx, "test_name")
+	ctx := context.Background()
+	firstSegment, err := store.Create(ctx, "test_name")
 	require.NoError(s.T(), err)
 	require.True(s.T(), firstSegment == 1)
 
-	err = store.Delete(s.ctx, "test_name")
+	err = store.Delete(ctx, "test_name")
 	require.NoError(s.T(), err)
 
 }
 
 func TestStore_Flow(t *testing.T) {
 	ts := testSuite{}
-	var cancel context.CancelFunc
-
-	ts.ctx, cancel = context.WithCancel(context.Background())
-	defer cancel()
 
 	cfg := config.MustLoad("../../../.test.env")
 	err := migrations.Run(cfg)
@@ -53,6 +49,6 @@ func TestStore_Flow(t *testing.T) {
 	suite.Run(t, &ts)
 }
 
-func (s *testSuite) truncate() {
-
-}
+//func (s *testSuite) truncate() {
+//
+//}

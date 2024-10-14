@@ -20,7 +20,7 @@ func New(executer Executer) *User {
 	}
 }
 
-func (s *User) Save(ctx context.Context, userName string) (int64, error) {
+func (s *User) Create(ctx context.Context, userName string) (int64, error) {
 	var userID int64
 
 	query, args, err := buildInsertQuery(userName)
