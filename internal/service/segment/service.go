@@ -1,3 +1,5 @@
+//go:generate mockgen -source=service.go -destination=mocks/mock_segmentRepo.go -package=mocks
+
 package segment
 
 import (
