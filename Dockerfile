@@ -1,22 +1,36 @@
-# выбираем образ, здесь подойдет легковесный гошный alpine
+# Build the Go app
 FROM golang:1.21-alpine AS builder
 
-# устанавливаем рабочую директорию внутри контейнера. При запуске окажемся там
 WORKDIR /app
 
-# копируем исходники
 COPY . .
 
-# подтягиваем зависимости сервиса
 RUN go mod download
 
-# собираем бинарь
 RUN CGO_ENABLED=0 go build -o segment-manager ./cmd/service/
 
-# в итоге приложение запустится через еще более легкий образ alpine - восхитительно
+# Runner stage
 FROM alpine AS runner
 
-COPY --from=builder ["/app/segment-manager","/app/.env", "./"]
+WORKDIR /app
 
-# точка входа
-CMD ["./segment-manager"]
+# Устанавливаем bash и netcat
+RUN apk add --no-cache bash netcat-openbsd
+
+# Копируем бинарный файл приложения
+COPY --from=builder /app/segment-manager ./
+
+# Копируем директорию миграций
+COPY --from=builder /app/db/migrations /app/db/migrations
+
+# Копируем файл .env
+COPY .env ./
+
+# Копируем скрипт wait-for-it.sh
+COPY wait-for-it.sh ./
+
+# Делаем скрипт исполняемым
+RUN chmod +x wait-for-it.sh
+
+# Точка входа с ожиданием базы данных
+CMD ["./wait-for-it.sh", "postgres:5432", "--", "./segment-manager"]

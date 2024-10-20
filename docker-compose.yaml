@@ -4,15 +4,23 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres
-    ports:
-      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: test_db
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+      POSTGRES_DB: segment-manager
+
+  service:
+    build:
+      context: .  # Путь к директории с Dockerfile
+      dockerfile: Dockerfile  # Имя вашего Dockerfile, если отличается от "Dockerfile"
+    container_name: service
+    ports:
+      - "8080:8080"  # Пробрасываем порт 8080 контейнера на порт 8080 хоста
+    depends_on:
+      - postgres
 
 volumes:
-  postgres-data:
+    postgres-data:
 
