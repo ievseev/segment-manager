@@ -1,3 +1,5 @@
+//go:generate mockgen -source=service.go -destination=mocks/mock_userRepo.go -package=mocks
+
 package user
 
 import (
@@ -5,7 +7,7 @@ import (
 )
 
 type userRepo interface {
-	Save(ctx context.Context, userName string) (int64, error)
+	Create(ctx context.Context, userName string) (int64, error)
 }
 
 type Service struct {
@@ -19,7 +21,7 @@ func New(userRepo userRepo) *Service {
 func (s *Service) CreateUser(ctx context.Context, name string) (int64, error) {
 	var userID int64
 
-	userID, err := s.userRepo.Save(ctx, name)
+	userID, err := s.userRepo.Create(ctx, name)
 	if err != nil {
 		return userID, err
 	}

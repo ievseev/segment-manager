@@ -34,6 +34,21 @@ func (m *MocksegmentRepo) EXPECT() *MocksegmentRepoMockRecorder {
 	return m.recorder
 }
 
+// Create mocks base method.
+func (m *MocksegmentRepo) Create(ctx context.Context, segmentName string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, segmentName)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MocksegmentRepoMockRecorder) Create(ctx, segmentName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MocksegmentRepo)(nil).Create), ctx, segmentName)
+}
+
 // Delete mocks base method.
 func (m *MocksegmentRepo) Delete(ctx context.Context, segmentName string) error {
 	m.ctrl.T.Helper()
@@ -46,19 +61,4 @@ func (m *MocksegmentRepo) Delete(ctx context.Context, segmentName string) error 
 func (mr *MocksegmentRepoMockRecorder) Delete(ctx, segmentName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MocksegmentRepo)(nil).Delete), ctx, segmentName)
-}
-
-// Save mocks base method.
-func (m *MocksegmentRepo) Save(ctx context.Context, segmentName string) (int64, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Save", ctx, segmentName)
-	ret0, _ := ret[0].(int64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Save indicates an expected call of Save.
-func (mr *MocksegmentRepoMockRecorder) Save(ctx, segmentName interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MocksegmentRepo)(nil).Save), ctx, segmentName)
 }

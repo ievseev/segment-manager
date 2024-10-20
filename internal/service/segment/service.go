@@ -7,7 +7,7 @@ import (
 )
 
 type segmentRepo interface {
-	Save(ctx context.Context, segmentName string) (int64, error)
+	Create(ctx context.Context, segmentName string) (int64, error)
 	Delete(ctx context.Context, segmentName string) error
 }
 
@@ -22,7 +22,7 @@ func New(segmentRepo segmentRepo) *Service {
 func (s *Service) CreateSegment(ctx context.Context, name string) (int64, error) {
 	var segmentID int64
 
-	segmentID, err := s.segmentRepo.Save(ctx, name)
+	segmentID, err := s.segmentRepo.Create(ctx, name)
 	if err != nil {
 		return segmentID, err
 	}
