@@ -15,37 +15,47 @@ type SegmentService interface {
 	CreateSegment(ctx context.Context, slug string) (int64, error)
 }
 
-func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req Request
+type CreateSegment struct {
+	segmentService SegmentService
+	log            *slog.Logger
+}
 
-		err := render.DecodeJSON(r.Body, &req)
-		if err != nil {
-			log.Error("Failed to decode req")
-			model.SendErrorResponse(w, http.StatusBadRequest, "Failed to decode req")
+func New(segmentService SegmentService, log *slog.Logger) *CreateSegment {
+	return &CreateSegment{
+		segmentService: segmentService,
+		log:            log,
+	}
+}
 
-			return
-		}
+func (h *CreateSegment) Handler(w http.ResponseWriter, r *http.Request) {
+	var req Request
 
-		if err := validator.New().Struct(req); err != nil {
-			log.Error("Request validation error")
-			model.SendErrorResponse(w, http.StatusBadRequest, "Request validation error")
-
-			return
-		}
-
-		segmentID, err := segmentService.CreateSegment(r.Context(), req.Slug)
-		if err != nil {
-			log.Error("Failed to create segment")
-			model.SendErrorResponse(w, http.StatusInternalServerError, "Failed to create segment")
-
-			return
-		}
-
-		render.JSON(w, r, Response{
-			SegmentID: segmentID,
-		})
+	err := render.DecodeJSON(r.Body, &req)
+	if err != nil {
+		h.log.Error("Failed to decode req")
+		model.SendErrorResponse(w, http.StatusBadRequest, "Failed to decode req")
 
 		return
 	}
+
+	if err := validator.New().Struct(req); err != nil {
+		h.log.Error("Request validation error")
+		model.SendErrorResponse(w, http.StatusBadRequest, "Request validation error")
+
+		return
+	}
+
+	segmentID, err := h.segmentService.CreateSegment(r.Context(), req.Slug)
+	if err != nil {
+		h.log.Error("Failed to create segment")
+		model.SendErrorResponse(w, http.StatusInternalServerError, "Failed to create segment")
+
+		return
+	}
+
+	render.JSON(w, r, Response{
+		SegmentID: segmentID,
+	})
+
+	return
 }

@@ -31,19 +31,21 @@ func NewServer(cfg *config.Config, log *slog.Logger) (*Server, error) {
 		return nil, err
 	}
 
+	// init services
 	segmentDB := segment.New(storage)
 	userDB := user.New(storage)
 	segmentService := segService.New(segmentDB)
 	userService := usService.New(userDB)
 
+	// init router
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Post("/api/createSegment", api_create_segment.New(log, segmentService))
-	router.Post("/api/deleteSegment", api_delete_segment.New(log, segmentService))
-	router.Post("/api/createUser", api_create_user.New(log, userService))
+	router.Post("/api/createSegment", api_create_segment.New(segmentService, log).Handler)
+	router.Post("/api/deleteSegment", api_delete_segment.New(segmentService, log).Handler)
+	router.Post("/api/createUser", api_create_user.New(userService, log).Handler)
 
 	return &Server{
 		cfg:    cfg,

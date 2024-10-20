@@ -15,35 +15,42 @@ type SegmentService interface {
 	Delete(ctx context.Context, slug string) error
 }
 
-func New(log *slog.Logger, segmentService SegmentService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req Request
+type DeleteSegment struct {
+	segmentService SegmentService
+	log            *slog.Logger
+}
 
-		err := render.DecodeJSON(r.Body, &req)
-		if err != nil {
-			log.Error("Failed to decode req")
-			model.SendErrorResponse(w, http.StatusBadRequest, "Failed to decode req")
+func New(segmentService SegmentService, log *slog.Logger) *DeleteSegment {
+	return &DeleteSegment{segmentService: segmentService, log: log}
+}
 
-			return
-		}
+func (h *DeleteSegment) Handler(w http.ResponseWriter, r *http.Request) {
+	var req Request
 
-		if err := validator.New().Struct(req); err != nil {
-			log.Error("Request validation error")
-			model.SendErrorResponse(w, http.StatusBadRequest, "Request validation error")
-
-			return
-		}
-
-		err = segmentService.Delete(r.Context(), req.Slug)
-		if err != nil {
-			log.Error("Failed to delete segment")
-			model.SendErrorResponse(w, http.StatusInternalServerError, "Failed to delete segment")
-
-			return
-		}
-
-		render.JSON(w, r, Response{})
+	err := render.DecodeJSON(r.Body, &req)
+	if err != nil {
+		h.log.Error("Failed to decode req")
+		model.SendErrorResponse(w, http.StatusBadRequest, "Failed to decode req")
 
 		return
 	}
+
+	if err := validator.New().Struct(req); err != nil {
+		h.log.Error("Request validation error")
+		model.SendErrorResponse(w, http.StatusBadRequest, "Request validation error")
+
+		return
+	}
+
+	err = h.segmentService.Delete(r.Context(), req.Slug)
+	if err != nil {
+		h.log.Error("Failed to delete segment")
+		model.SendErrorResponse(w, http.StatusInternalServerError, "Failed to delete segment")
+
+		return
+	}
+
+	render.JSON(w, r, Response{})
+
+	return
 }
