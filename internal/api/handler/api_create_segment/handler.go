@@ -1,3 +1,5 @@
+//go:generate mockgen -source=handler.go -destination=mocks/mock_createSegment.go -package=mocks
+
 package api_create_segment
 
 import (
