@@ -1,4 +1,4 @@
-package user
+package user_segment
 
 import (
 	"fmt"
@@ -16,10 +16,13 @@ const (
 	segmentIDsField = "segment_ids"
 )
 
-func buildUpsertQuery(userID string, segmentIDs []string) (string, []interface{}, error) {
+func buildUpsertQuery(userID int64, updateIDs []int64) (string, []interface{}, error) {
 	return qb.Insert(usersSegmentsTable).
 		Columns(userIDField, segmentIDsField).
-		Values(userID, pq.Array(segmentIDs)).
-		Suffix(fmt.Sprintf("ON CONFLICT (%s) DO UPDATE SET %s = EXCLUDED.%s", userIDField, segmentIDs, segmentIDs)).
-		ToSql()
+		Values(userID, pq.Array(updateIDs)).
+		Suffix(fmt.Sprintf(`ON CONFLICT (%s) DO UPDATE SET %s = EXCLUDED.segment_ids`, userIDField, segmentIDsField)).ToSql()
+}
+
+func buildSelectQuery(userID int64) (string, []interface{}, error) {
+	return qb.Select(userIDField).From(usersSegmentsTable).Where(sq.Eq{userIDField: userID}).ToSql()
 }

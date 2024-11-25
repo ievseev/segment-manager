@@ -7,12 +7,15 @@ import (
 	"segment-manager/internal/api/handler/api_create_segment"
 	"segment-manager/internal/api/handler/api_create_user"
 	"segment-manager/internal/api/handler/api_delete_segment"
+	"segment-manager/internal/api/handler/api_update_user_segments"
 	"segment-manager/internal/config"
 	segService "segment-manager/internal/service/segment"
 	usService "segment-manager/internal/service/user"
+	ussService "segment-manager/internal/service/user_segment"
 	"segment-manager/internal/storage/postgres"
 	"segment-manager/internal/store/segment"
 	"segment-manager/internal/store/user"
+	"segment-manager/internal/store/user_segment"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -34,8 +37,10 @@ func NewServer(cfg *config.Config, log *slog.Logger) (*Server, error) {
 	// init services
 	segmentDB := segment.New(storage)
 	userDB := user.New(storage)
+	userSegmentDB := user_segment.New(storage)
 	segmentService := segService.New(segmentDB)
 	userService := usService.New(userDB)
+	userSegmentService := ussService.New(userSegmentDB)
 
 	// init router
 	router := chi.NewRouter()
@@ -46,6 +51,7 @@ func NewServer(cfg *config.Config, log *slog.Logger) (*Server, error) {
 	router.Post("/api/createSegment", api_create_segment.New(segmentService, log).Handler)
 	router.Post("/api/deleteSegment", api_delete_segment.New(segmentService, log).Handler)
 	router.Post("/api/createUser", api_create_user.New(userService, log).Handler)
+	router.Post("/api/updateUserSegments", api_update_user_segments.New(userSegmentService, log).Handler)
 
 	return &Server{
 		cfg:    cfg,

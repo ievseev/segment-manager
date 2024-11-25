@@ -37,6 +37,14 @@ func (s *Storage) ExecContext(ctx context.Context, query string, args ...interfa
 	return s.db.ExecContext(ctx, query, args...)
 }
 
+func (s *Storage) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
+	return s.db.QueryContext(ctx, query, args...)
+}
+
 func (s *Storage) QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row {
 	return s.db.QueryRowContext(ctx, query, args...)
+}
+
+func (s *Storage) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
+	return s.db.BeginTx(ctx, opts)
 }
