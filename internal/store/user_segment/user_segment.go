@@ -10,6 +10,7 @@ import (
 )
 
 type Executer interface {
+	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
@@ -25,7 +26,7 @@ func New(executer Executer) *UserSegment {
 	}
 }
 
-func (s *UserSegment) Upsert(ctx context.Context, userID int64, slugsToAdd, slugsToDelete []string) error {
+func (s *UserSegment) UpsertUserSegments(ctx context.Context, userID int64, slugsToAdd, slugsToDelete []string) error {
 	tx, err := s.Executer.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("для userID %d ошибка при начале транзакции: %w", userID, err)
@@ -72,6 +73,18 @@ func (s *UserSegment) Upsert(ctx context.Context, userID int64, slugsToAdd, slug
 	}
 
 	return nil
+}
+
+func (s *UserSegment) SelectUserSegments(ctx context.Context, userID int64) ([]string, error) {
+	query, args, err := buildSelectUserSegmentsQuery(userID)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка при построении SQL-запроса: %w", err)
+	}
+
+	var slugs []string
+	s.Executer.QueryRowContext(ctx, query, args...).Scan(&slugs)
+
+	return slugs, nil
 }
 
 // Вспомогательная функция для получения списка ID сегментов по слагам

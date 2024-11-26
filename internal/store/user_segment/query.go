@@ -26,3 +26,17 @@ func buildUpsertQuery(userID int64, updateIDs []int64) (string, []interface{}, e
 func buildSelectQuery(userID int64) (string, []interface{}, error) {
 	return qb.Select(userIDField).From(usersSegmentsTable).Where(sq.Eq{userIDField: userID}).ToSql()
 }
+
+func buildSelectUserSegmentsQuery(userID int64) (string, []interface{}, error) {
+	// Создаем подзапрос
+	subQuery := sq.Select("unnest(segment_ids)").
+		From("users_segments").
+		Where(sq.Eq{"user_id": userID})
+
+	// Создаем основной запрос с использованием подзапроса
+	queryBuilder := sq.Select("slug").
+		From("segments").
+		Where(sq.Expr(`id IN (?)`, subQuery))
+
+	return queryBuilder.ToSql()
+}
