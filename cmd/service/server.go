@@ -7,6 +7,7 @@ import (
 	"segment-manager/internal/api/handler/api_create_segment"
 	"segment-manager/internal/api/handler/api_create_user"
 	"segment-manager/internal/api/handler/api_delete_segment"
+	"segment-manager/internal/api/handler/api_get_user_segments"
 	"segment-manager/internal/api/handler/api_update_user_segments"
 	"segment-manager/internal/config"
 	segService "segment-manager/internal/service/segment"
@@ -52,6 +53,7 @@ func NewServer(cfg *config.Config, log *slog.Logger) (*Server, error) {
 	router.Post("/api/deleteSegment", api_delete_segment.New(segmentService, log).Handler)
 	router.Post("/api/createUser", api_create_user.New(userService, log).Handler)
 	router.Post("/api/updateUserSegments", api_update_user_segments.New(userSegmentService, log).Handler)
+	router.Get("/api/getUserSegments", api_get_user_segments.New(userSegmentService, log).Handler)
 
 	return &Server{
 		cfg:    cfg,

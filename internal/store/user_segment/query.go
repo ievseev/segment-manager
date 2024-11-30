@@ -28,15 +28,27 @@ func buildSelectQuery(userID int64) (string, []interface{}, error) {
 }
 
 func buildSelectUserSegmentsQuery(userID int64) (string, []interface{}, error) {
-	// Создаем подзапрос
-	subQuery := sq.Select("unnest(segment_ids)").
-		From("users_segments").
-		Where(sq.Eq{"user_id": userID})
+	// Создаем подзапрос для извлечения segment_ids
+	subQuery := qb.Select("unnest(segment_ids)").
+		From(usersSegmentsTable).
+		Where(sq.Eq{userIDField: userID})
 
-	// Создаем основной запрос с использованием подзапроса
-	queryBuilder := sq.Select("slug").
+	// Получаем SQL и аргументы для подзапроса
+	subSQL, args, err := subQuery.ToSql()
+	if err != nil {
+		return "", nil, fmt.Errorf("ошибка построения подзапроса: %w", err)
+	}
+
+	// Создаем основной запрос, используя подзапрос в секции WHERE
+	mainQuery := qb.Select("id", "slug").
 		From("segments").
-		Where(sq.Expr(`id IN (?)`, subQuery))
+		Where(fmt.Sprintf("id IN (%s)", subSQL))
 
-	return queryBuilder.ToSql()
+	// Получаем SQL и аргументы для основного запроса
+	mainSQL, _, err := mainQuery.ToSql()
+	if err != nil {
+		return "", nil, fmt.Errorf("ошибка построения основного запроса: %w", err)
+	}
+
+	return mainSQL, args, nil
 }

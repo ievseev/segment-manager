@@ -31,8 +31,6 @@ func New(cfg *config.Config) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
-// TODO Сlose() и другие ребята?
-
 func (s *Storage) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
 	return s.db.ExecContext(ctx, query, args...)
 }

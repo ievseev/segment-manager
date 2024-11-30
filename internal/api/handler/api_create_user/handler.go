@@ -27,27 +27,27 @@ func New(userService UserService, log *slog.Logger) *CreateUser {
 	}
 }
 
-func (h *CreateUser) Handler(w http.ResponseWriter, r *http.Request) {
+func (c *CreateUser) Handler(w http.ResponseWriter, r *http.Request) {
 	var req Request
 
 	err := render.DecodeJSON(r.Body, &req)
 	if err != nil {
-		h.log.Error("Failed to decode req")
+		c.log.Error("Failed to decode req")
 		model.SendErrorResponse(w, http.StatusBadRequest, "Failed to decode req")
 
 		return
 	}
 
 	if err := validator.New().Struct(req); err != nil {
-		h.log.Error("Request validation error")
+		c.log.Error("Request validation error")
 		model.SendErrorResponse(w, http.StatusBadRequest, "Request validation error")
 
 		return
 	}
 
-	userID, err := h.userService.CreateUser(r.Context(), req.Name)
+	userID, err := c.userService.CreateUser(r.Context(), req.Name)
 	if err != nil {
-		h.log.Error("Failed to create segment")
+		c.log.Error("Failed to create segment")
 		model.SendErrorResponse(w, http.StatusInternalServerError, "Failed to create user")
 
 		return

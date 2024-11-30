@@ -75,16 +75,15 @@ func (s *UserSegment) UpsertUserSegments(ctx context.Context, userID int64, slug
 	return nil
 }
 
-func (s *UserSegment) SelectUserSegments(ctx context.Context, userID int64) ([]string, error) {
+func (s *UserSegment) SelectUserSegments(ctx context.Context, userID int64) ([]UserSegmentDB, error) {
 	query, args, err := buildSelectUserSegmentsQuery(userID)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка при построении SQL-запроса: %w", err)
 	}
 
-	var slugs []string
-	s.Executer.QueryRowContext(ctx, query, args...).Scan(&slugs)
+	rows, _ := s.Executer.QueryContext(ctx, query, args...)
 
-	return slugs, nil
+	return scanRowsToSegments(rows)
 }
 
 // Вспомогательная функция для получения списка ID сегментов по слагам
@@ -124,6 +123,26 @@ func scanRowsToIDs(rows *sql.Rows) ([]int64, error) {
 	}
 
 	return ids, nil
+}
+
+// scanRowsToIDs сканирует *sql.Rows и возвращает срез Segments
+func scanRowsToSegments(rows *sql.Rows) ([]UserSegmentDB, error) {
+	defer rows.Close()
+
+	userSegments := make([]UserSegmentDB, 0)
+	for rows.Next() {
+		userSegment := UserSegmentDB{}
+		if err := rows.Scan(&userSegment.ID, &userSegment.Slug); err != nil {
+			return nil, fmt.Errorf("ошибка при сканировании строки: %w", err)
+		}
+		userSegments = append(userSegments, userSegment)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("ошибка при итерации по строкам: %w", err)
+	}
+
+	return userSegments, nil
 }
 
 func getUpdatedIDs(currentIDs, addIDs, deleteIDs []int64) []int64 {

@@ -1,10 +1,6 @@
-package api_update_user_segments
+package api_get_user_segments
 
 import "segment-manager/internal/api/model"
-
-type Request struct {
-	UserID int64 `json:"user_id" validate:"required"`
-}
 
 type Response struct {
 	Segments []Segment          `json:"segments"`
