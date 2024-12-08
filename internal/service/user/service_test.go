@@ -55,7 +55,8 @@ func TestService_CreateUser(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			userID, err := tc.userRepoMock.Create(ctx, tc.userName)
+			service := New(tc.userRepoMock)
+			userID, err := service.CreateUser(ctx, tc.userName)
 
 			if tc.wantErr {
 				assert.Error(t, err)

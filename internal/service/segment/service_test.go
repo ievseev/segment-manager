@@ -55,7 +55,8 @@ func TestService_CreateSegment(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			segmentID, err := tc.segmentRepoMock.Create(ctx, tc.slug)
+			service := New(tc.segmentRepoMock)
+			segmentID, err := service.CreateSegment(ctx, tc.slug)
 
 			if tc.wantErr {
 				assert.Error(t, err)
@@ -108,7 +109,8 @@ func TestService_DeleteSegment(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := tc.segmentRepoMock.Delete(ctx, tc.slug)
+			service := New(tc.segmentRepoMock)
+			err := service.Delete(ctx, tc.slug)
 
 			if tc.wantErr {
 				assert.Error(t, err)

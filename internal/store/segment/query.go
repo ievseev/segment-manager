@@ -1,8 +1,6 @@
 package segment
 
 import (
-	"fmt"
-
 	sq "github.com/Masterminds/squirrel"
 )
 
@@ -16,9 +14,7 @@ const (
 )
 
 func buildInsertQuery(slug string) (string, []interface{}, error) {
-	returningClause := fmt.Sprintf("RETURNING %s", idField)
-
-	return qb.Insert(segmentsTable).Columns(slugField).Values(slug).Suffix(returningClause).ToSql()
+	return qb.Insert(segmentsTable).Columns(slugField).Values(slug).Suffix("RETURNING id").ToSql()
 }
 
 func buildDeleteQuery(slug string) (string, []interface{}, error) {
